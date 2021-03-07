@@ -99,7 +99,7 @@ public class EntityConverter
                            ).build()
 
                ).build();
-       }
+        }
         else if(entityData.getKinematics().getPosition().hasSpherical())
         {
             PositionOuterClass.SphericalPosition posSpherical = entityData.getKinematics().getPosition().getSpherical();
@@ -120,6 +120,10 @@ public class EntityConverter
 
                     ).build();
         }
-       return null;
+        else if(entityData.getKinematics().getPosition().hasCartesian())
+        {
+            return entityData;
+        }
+        return null;
     }
 }
