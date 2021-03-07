@@ -1,0 +1,36 @@
+image: maven:latest
+
+stages:
+  - build
+#   - deploy
+
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - ${CI_PROJECT_DIR}/.m2/repository/
+    - ${CI_PROJECT_DIR}/target/
+
+
+build:
+  stage: build
+  variables:   
+    MAVEN_CLI_OPTS: "-s .m2/settings.xml --batch-mode"
+    MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true" 
+
+  
+  artifacts:
+    paths:
+      - target/kafka-entity-serde-1.0-SNAPSHOT.jar
+
+  script:
+    - mvn $MAVEN_CLI_OPTS install
+
+# deploy:
+#   stage: deploy
+#   script:
+#     # - mvn dependency:get -Dartifact=org.air6500:kafka-model-schema-java:1.0-SNAPSHOT -Dmaven.repo.local=.m2/repository -Dmaven.wagon.http.ssl.insecure=true
+#     - mvn deploy  -s ci_settings.xml -Dmaven.wagon.http.ssl.insecure=true
+#   only:
+#     - master
+
