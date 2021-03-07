@@ -86,7 +86,7 @@ public class EntityConverter
            double dX = entityData.getKinematics().getPosition().getPolar().getRange() * Math.sin(entityData.getKinematics().getPosition().getPolar().getAzimuth());
            double dY = entityData.getKinematics().getPosition().getPolar().getRange() * Math.cos(entityData.getKinematics().getPosition().getPolar().getAzimuth());
            dX = SCALE * dX + XOFFSET;
-           dY = SCALE * dY+ YOFFSET;
+           dY = SCALE * dY + YOFFSET;
 
            return EntityData.newBuilder()
                .setTimestamp(entityData.getTimestamp())
