@@ -35,28 +35,73 @@ public class EntityConverter
     private final static double XOFFSET = 2000.0;
     private final static double YOFFSET = 2000.0;
 
-    // Consume from the `prices` channel and produce to the `my-data-stream` channel
     @Incoming("entity-entity")
     @Outgoing("entity-json-stream")
     // Send to all subscribers
     @Broadcast
     // Acknowledge the messages before calling this method.
     @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
-    public Multi<String> process(Entity.EntityMessage msgEntity)
+    public Multi<String> processEntity(Entity.EntityMessage msgEntity)
     {
-        LOGGER.infov("Recieved entity message: {0}", msgEntity.getDataList().stream().map(data -> data.getId().getUuid().getValue()).collect(Collectors.joining(",")));
+        LOGGER.infov("Received entity message: {0}", msgEntity.getDataList().stream().map(data -> data.getId().getUuid().getValue()).collect(Collectors.joining(",")));
 
         return Multi.createFrom().items
-        (
-            msgEntity.getDataList().stream()
-                .map
-                (
-                    data ->
-                    {
-                        return entityDataToJson(transformData(data));
-                    }
-                )
-        );
+            (
+                msgEntity.getDataList().stream()
+                    .map
+                        (
+                            data ->
+                            {
+                                return entityDataToJson(transformData(data));
+                            }
+                        )
+            );
+    }
+
+    @Incoming("entity-plot")
+    @Outgoing("plot-json-stream")
+    // Send to all subscribers
+    @Broadcast
+    // Acknowledge the messages before calling this method.
+    @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
+    public Multi<String> processPlot(Entity.EntityMessage msgEntity)
+    {
+        LOGGER.infov("Received entity message: {0}", msgEntity.getDataList().stream().map(data -> data.getId().getUuid().getValue()).collect(Collectors.joining(",")));
+
+        return Multi.createFrom().items
+            (
+                msgEntity.getDataList().stream()
+                    .map
+                        (
+                            data ->
+                            {
+                                return entityDataToJson(transformData(data));
+                            }
+                        )
+            );
+    }
+
+    @Incoming("entity-track")
+    @Outgoing("track-json-stream")
+    // Send to all subscribers
+    @Broadcast
+    // Acknowledge the messages before calling this method.
+    @Acknowledgment(Acknowledgment.Strategy.PRE_PROCESSING)
+    public Multi<String> processTrack(Entity.EntityMessage msgEntity)
+    {
+        LOGGER.infov("Received entity message: {0}", msgEntity.getDataList().stream().map(data -> data.getId().getUuid().getValue()).collect(Collectors.joining(",")));
+
+        return Multi.createFrom().items
+            (
+                msgEntity.getDataList().stream()
+                    .map
+                        (
+                            data ->
+                            {
+                                return entityDataToJson(transformData(data));
+                            }
+                        )
+            );
     }
 
     protected String entityDataToJson(Entity.EntityData entityData)
@@ -77,18 +122,40 @@ public class EntityConverter
 
     protected Entity.EntityData transformData(EntityData entityData)
     {
-       if(entityData.getKinematics().getPosition().hasCartesian())
-       {
-           return entityData;
-       }
-       if(entityData.getKinematics().getPosition().hasPolar())
-       {
-           double dX = entityData.getKinematics().getPosition().getPolar().getRange() * Math.sin(entityData.getKinematics().getPosition().getPolar().getAzimuth());
-           double dY = entityData.getKinematics().getPosition().getPolar().getRange() * Math.cos(entityData.getKinematics().getPosition().getPolar().getAzimuth());
-           dX = SCALE * dX + XOFFSET;
-           dY = SCALE * dY + YOFFSET;
+        try
+        {
+            LOGGER.infov("Input entity message - {0}", JsonFormat.printer().preservingProtoFieldNames().print(entityData));
+        }
+        catch (InvalidProtocolBufferException e)
+        {
+            LOGGER.error("Error in json serialisation: ", e);
+        }
 
-           return EntityData.newBuilder()
+        if(entityData.getKinematics().getPosition().hasCartesian())
+        {
+            double dX = SCALE * entityData.getKinematics().getPosition().getCartesian().getX() + XOFFSET;
+            double dY = SCALE * entityData.getKinematics().getPosition().getCartesian().getY() + YOFFSET;
+
+            return EntityData.newBuilder()
+                .setTimestamp(entityData.getTimestamp())
+                .setId(entityData.getId())
+                .setKinematics
+                    (
+                        KinematicsOuterClass.Kinematics.newBuilder().setPosition
+                            (
+                                PositionOuterClass.Position.newBuilder().setCartesian(PositionOuterClass.CartesianPosition.newBuilder().setX(dX).setY(dY).setZ(0.0).build())
+                            ).build()
+
+                    ).build();
+        }
+        else if(entityData.getKinematics().getPosition().hasPolar())
+        {
+            double dX = entityData.getKinematics().getPosition().getPolar().getRange() * Math.sin(entityData.getKinematics().getPosition().getPolar().getAzimuth());
+            double dY = entityData.getKinematics().getPosition().getPolar().getRange() * Math.cos(entityData.getKinematics().getPosition().getPolar().getAzimuth());
+            dX = SCALE * dX + XOFFSET;
+            dY = SCALE * dY + YOFFSET;
+
+            return EntityData.newBuilder()
                .setTimestamp(entityData.getTimestamp())
                .setId(entityData.getId())
                .setKinematics
@@ -119,10 +186,6 @@ public class EntityConverter
                             ).build()
 
                     ).build();
-        }
-        else if(entityData.getKinematics().getPosition().hasCartesian())
-        {
-            return entityData;
         }
         return null;
     }
