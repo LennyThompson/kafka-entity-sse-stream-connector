@@ -2,6 +2,7 @@ package org.air6500.kafka;
 
 import javax.enterprise.context.ApplicationScoped;
 
+import covariance.CovarianceOuterClass;
 import kinematics.KinematicsOuterClass;
 import org.eclipse.microprofile.reactive.messaging.Acknowledgment;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
@@ -144,6 +145,16 @@ public class EntityConverter
                         KinematicsOuterClass.Kinematics.newBuilder().setPosition
                             (
                                 PositionOuterClass.Position.newBuilder().setCartesian(PositionOuterClass.CartesianPosition.newBuilder().setX(dX).setY(dY).setZ(0.0).build())
+                            )
+                            .setPositionCovarianceSqrt
+                            (
+                                CovarianceOuterClass.CovarianceSqrt.newBuilder()
+                                    .setR1C1(entityData.getKinematics().getPositionCovarianceSqrt().getR1C1())
+                                    .setR2C1(entityData.getKinematics().getPositionCovarianceSqrt().getR2C1())
+                                    .setR2C2(entityData.getKinematics().getPositionCovarianceSqrt().getR2C2())
+                                    .setR3C1(entityData.getKinematics().getPositionCovarianceSqrt().getR3C1())
+                                    .setR3C2(entityData.getKinematics().getPositionCovarianceSqrt().getR3C2())
+                                    .setR3C3(entityData.getKinematics().getPositionCovarianceSqrt().getR3C3())
                             ).build()
 
                     ).build();
@@ -163,6 +174,16 @@ public class EntityConverter
                        KinematicsOuterClass.Kinematics.newBuilder().setPosition
                            (
                                PositionOuterClass.Position.newBuilder().setCartesian(PositionOuterClass.CartesianPosition.newBuilder().setX(dX).setY(dY).setZ(0.0).build())
+                           )
+                           .setPositionCovarianceSqrt
+                           (
+                               CovarianceOuterClass.CovarianceSqrt.newBuilder()
+                                   .setR1C1(entityData.getKinematics().getPositionCovarianceSqrt().getR1C1())
+                                   .setR2C1(entityData.getKinematics().getPositionCovarianceSqrt().getR2C1())
+                                   .setR2C2(entityData.getKinematics().getPositionCovarianceSqrt().getR2C2())
+                                   .setR3C1(entityData.getKinematics().getPositionCovarianceSqrt().getR3C1())
+                                   .setR3C2(entityData.getKinematics().getPositionCovarianceSqrt().getR3C2())
+                                   .setR3C3(entityData.getKinematics().getPositionCovarianceSqrt().getR3C3())
                            ).build()
 
                ).build();
@@ -183,7 +204,18 @@ public class EntityConverter
                         KinematicsOuterClass.Kinematics.newBuilder().setPosition
                             (
                                 PositionOuterClass.Position.newBuilder().setCartesian(PositionOuterClass.CartesianPosition.newBuilder().setX(dX).setY(dY).setZ(0.0).build())
+                            )
+                            .setPositionCovarianceSqrt
+                            (
+                                CovarianceOuterClass.CovarianceSqrt.newBuilder()
+                                    .setR1C1(entityData.getKinematics().getPositionCovarianceSqrt().getR1C1())
+                                    .setR2C1(entityData.getKinematics().getPositionCovarianceSqrt().getR2C1())
+                                    .setR2C2(entityData.getKinematics().getPositionCovarianceSqrt().getR2C2())
+                                    .setR3C1(entityData.getKinematics().getPositionCovarianceSqrt().getR3C1())
+                                    .setR3C2(entityData.getKinematics().getPositionCovarianceSqrt().getR3C2())
+                                    .setR3C3(entityData.getKinematics().getPositionCovarianceSqrt().getR3C3())
                             ).build()
+
 
                     ).build();
         }
